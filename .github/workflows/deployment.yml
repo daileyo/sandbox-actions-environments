@@ -9,10 +9,26 @@ jobs:
     name:  Environment deployments
     strategy:
       matrix:
-        env:  [dev, qa, preprod]
+        include:
+          - gh_env: dev
+            namespace: test_dev
+            tag: ${{ github.sha }}
+            strategy: none
+          - gh_env: qa
+            namespace: test_qa            
+            tag: ${{ github.sha }}
+            strategy: qa-auto
+          - gh_env: dev
+            namespace: test_dev
+            tag: ${{ github.sha }}
+            strategy: uat-validation
+
+
     runs-on: ubuntu-latest
-    environment: ${{ matrix.env }}
+    environment: ${{ matrix.gh_env }}
     steps:
       - name: output Environment
-        run: echo Hello from ${{ matrix.env }}
+        run: | 
+          echo "Hello from ${{ matrix.gh_env }}"
+          echo "Using AWS Namesspace ${{ matrix.namespace }} and tag ${{ matrix.tag }} via strategy ${{ matrix.strategy }}"
 

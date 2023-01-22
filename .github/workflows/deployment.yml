@@ -9,10 +9,10 @@ jobs:
     name:  Environment deployments
     strategy:
       matrix:
-        envs:  [dev, qa, preprod]
+        env:  [dev, qa, preprod]
     runs-on: ubuntu-latest
+    environment: ${{ matrix.env }}
     steps:
       - name: output Environment
-        run: echo Hello from ${{ matrix.envs }}
-
+        run: echo Hello from ${{ matrix.env }}
 

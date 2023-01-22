@@ -18,7 +18,7 @@ jobs:
             namespace: test_qa            
             tag: ${{ github.sha }}
             strategy: qa-auto
-          - gh_env: dev
+          - gh_env: preprod
             namespace: test_dev
             tag: ${{ github.sha }}
             strategy: uat-validation

@@ -19,7 +19,7 @@ jobs:
             tag: ${{ github.sha }}
             strategy: qa-auto
           - gh_env: preprod
-            namespace: test_dev
+            namespace: test_preprod
             tag: ${{ github.sha }}
             strategy: uat-validation
 
@@ -27,8 +27,20 @@ jobs:
     runs-on: ubuntu-latest
     environment: ${{ matrix.gh_env }}
     steps:
-      - name: output Environment
+      - name: Test Output
         run: | 
           echo "Hello from ${{ matrix.gh_env }}"
           echo "Using AWS Namesspace ${{ matrix.namespace }} and tag ${{ matrix.tag }} via strategy ${{ matrix.strategy }}"
-
+      - name: Checkout Code
+        uses: actions/checkout@v3
+      - name: Create Component Test Environment
+        if: ${{ matrix.gh_env == 'qa' }}
+          # wget -qO - https://www.mongodb.org/static/pgp/server-6.0.asc |  gpg --dearmor | sudo tee /usr/share/keyrings/mongodb.gpg > /dev/null
+          # echo "deb [ arch=amd64,arm64 signed-by=/usr/share/keyrings/mongodb.gpg ] https://repo.mongodb.org/apt/ubuntu jammy/mongodb-org/6.0 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-6.0.list
+          # sudo apt update        
+        run: |
+          sudo apt install jq
+          docker run --name component-mongo -d -p 27017 mongo:latest
+          docker run -i --rm mongo --version 
+          echo "**** Verify jq: $(jq --version) ****"
+          

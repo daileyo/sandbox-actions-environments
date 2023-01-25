@@ -9,28 +9,31 @@ jobs:
     runs-on: ubuntu-latest
     container: 
       image: mongo:latest
+      
     services:
-      mongodb:
+      component-mongodb:
         image: mongo:latest
+        ports:
+          - 27017:27017
         
     name:  Environment deployments
-    strategy:
-      matrix:
-        include:
-          - gh_env: dev
-            namespace: test_dev
-            tag: ${{ github.sha }}
-            strategy: none
-          - gh_env: qa
-            namespace: test_qa            
-            tag: ${{ github.sha }}
-            strategy: qa-auto
-          - gh_env: preprod
-            namespace: test_preprod
-            tag: ${{ github.sha }}
-            strategy: uat-validation
+    # strategy:
+    #   matrix:
+    #     include:
+    #       - gh_env: dev
+    #         namespace: test_dev
+    #         tag: ${{ github.sha }}
+    #         strategy: none
+    #       - gh_env: qa
+    #         namespace: test_qa            
+    #         tag: ${{ github.sha }}
+    #         strategy: qa-auto
+    #       - gh_env: preprod
+    #         namespace: test_preprod
+    #         tag: ${{ github.sha }}
+    #         strategy: uat-validation
 
-    environment: ${{ matrix.gh_env }}
+    # environment: ${{ matrix.gh_env }}
     steps:
       # mongodb unit testing:  https://www.toptal.com/nodejs/integration-and-e2e-tests-nodejs-mongodb
       # sample data: https://medium.com/dbkoda/mongodb-sample-collections-52d6a7745908
@@ -41,12 +44,6 @@ jobs:
           echo "Using AWS Namesspace ${{ matrix.namespace }} and tag ${{ matrix.tag }} via strategy ${{ matrix.strategy }}"
       - name: Checkout Code
         uses: actions/checkout@v3
-      - name: Create Component Test Environment
-        if: ${{ matrix.gh_env == 'qa' }}  
-        run: |
-          sudo apt install jq
-          docker run --name component-mongo -d -p 27017 mongo:latest
-          docker run -i --rm mongo --version 
-          echo "**** Verify jq: $(jq --version) ****"
-
+      - name: Verify dependencies
+        run: mongosh mongodb://component-mongodb:27017 --eval 'db.version()'
 

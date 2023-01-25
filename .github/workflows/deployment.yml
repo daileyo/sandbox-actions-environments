@@ -6,6 +6,13 @@ on:
 
 jobs:
   deployments:
+    runs-on: ubuntu-latest
+    container: 
+      image: mongo:latest
+    services:
+      mongodb:
+        image: mongo:latest
+        
     name:  Environment deployments
     strategy:
       matrix:
@@ -23,10 +30,11 @@ jobs:
             tag: ${{ github.sha }}
             strategy: uat-validation
 
-
-    runs-on: ubuntu-latest
     environment: ${{ matrix.gh_env }}
     steps:
+      # mongodb unit testing:  https://www.toptal.com/nodejs/integration-and-e2e-tests-nodejs-mongodb
+      # sample data: https://medium.com/dbkoda/mongodb-sample-collections-52d6a7745908
+      #              https://github.com/SouthbankSoftware/dbkoda-data
       - name: Test Output
         run: | 
           echo "Hello from ${{ matrix.gh_env }}"
@@ -34,13 +42,11 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v3
       - name: Create Component Test Environment
-        if: ${{ matrix.gh_env == 'qa' }}
-          # wget -qO - https://www.mongodb.org/static/pgp/server-6.0.asc |  gpg --dearmor | sudo tee /usr/share/keyrings/mongodb.gpg > /dev/null
-          # echo "deb [ arch=amd64,arm64 signed-by=/usr/share/keyrings/mongodb.gpg ] https://repo.mongodb.org/apt/ubuntu jammy/mongodb-org/6.0 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-6.0.list
-          # sudo apt update        
+        if: ${{ matrix.gh_env == 'qa' }}  
         run: |
           sudo apt install jq
           docker run --name component-mongo -d -p 27017 mongo:latest
           docker run -i --rm mongo --version 
           echo "**** Verify jq: $(jq --version) ****"
-          
+
+

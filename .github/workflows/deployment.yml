@@ -38,12 +38,12 @@ jobs:
       # mongodb unit testing:  https://www.toptal.com/nodejs/integration-and-e2e-tests-nodejs-mongodb
       # sample data: https://medium.com/dbkoda/mongodb-sample-collections-52d6a7745908
       #              https://github.com/SouthbankSoftware/dbkoda-data
-      - name: Test Output
-        run: | 
-          echo "Hello from ${{ matrix.gh_env }}"
-          echo "Using AWS Namesspace ${{ matrix.namespace }} and tag ${{ matrix.tag }} via strategy ${{ matrix.strategy }}"
+      #- name: Test Output
+        # run: | 
+        #   echo "Hello from ${{ matrix.gh_env }}"
+        #   echo "Using AWS Namesspace ${{ matrix.namespace }} and tag ${{ matrix.tag }} via strategy ${{ matrix.strategy }}"
       - name: Checkout Code
         uses: actions/checkout@v3
       - name: Verify dependencies
-        run: mongosh mongodb://component-mongodb:27017 --eval 'db.version()'
+        run: mongosh mongodb://component-mongodb:27017 --eval 'db.disableFreeMonitoring(); db.version()'
 
